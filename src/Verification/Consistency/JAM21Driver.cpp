@@ -12,10 +12,21 @@ bool JAM21Driver::isConsistent(const EventLabel *lab) const
 	return true;
 }
 
+/*
+ *  Calculates RA relation
+ *  RA := po; [REL | ACQ | V]; po
+ */
+// TODO: leverage visited status not to calculate this again
 void JAM21Driver::calculateRA(const EventLabel *lab) const {
 	auto &g = getGraph();
-
 	auto po_pred = g.po_preds(lab);
+
+	// Get initial RA events already saved
+	// Assuming each event is ivisited just once,
+	// this is not nescessary
+	std::vector<Event> initial_events;
+	auto it = relationRA.find(lab->getPos());
+	if (it != relationRA.end()) initial_events = it->second;
 
 	// Multiple PO preds when threds joining (?)
 	for (const auto &pred : po_pred) {
@@ -29,9 +40,15 @@ void JAM21Driver::calculateRA(const EventLabel *lab) const {
 		auto initial_po = g.po_preds(&pred);
 
 		for (const auto &pred : initial_po) {
-			llvm::outs() << "Found RA between: " << *lab << " and " << pred << "\n";
+			initial_events.push_back(pred.getPos());
 		}
 	}
+
+	llvm::outs() << "Initial Events for "<< lab->getPos() <<": ";
+	for (const auto &event : initial_events) {
+		llvm::outs() << event << " ";
+	}gi
+	llvm::outs() << "\n";
 }
 
 bool JAM21Driver::isDepTracking() const

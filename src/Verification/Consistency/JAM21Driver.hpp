@@ -34,6 +34,7 @@
 #include "Verification/VerificationError.hpp"
 #include <cstdint>
 #include <vector>
+#include <map>
 
 class JAM21Driver : public GenMCDriver {
 
@@ -65,6 +66,7 @@ public:
 
 private:
 	void calculateRA(const EventLabel *lab) const;
+	std::map<Event, std::vector<Event>> relationRA;
 
 	bool isWriteRfBefore(Event a, Event b);
 	std::vector<Event> getInitRfsAtLoc(SAddr addr);
