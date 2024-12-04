@@ -19,36 +19,33 @@ bool JAM21Driver::isConsistent(const EventLabel *lab) const
 // TODO: leverage visited status not to calculate this again
 void JAM21Driver::calculateRA(const EventLabel *lab) const {
 	auto &g = getGraph();
-	auto po_pred = g.po_preds(lab);
+	auto po_pred = po_imm_pred(g, lab);
 
-	// Get initial RA events already saved
-	// Assuming each event is ivisited just once,
-	// this is not nescessary
-	std::vector<Event> initial_events;
-	auto it = relationRA.find(lab->getPos());
-	if (it != relationRA.end()) initial_events = it->second;
-
-	// Multiple PO preds when threds joining (?)
-	for (const auto &pred : po_pred) {
-		bool isCorrectAccessType = pred.isAtLeastAcquire() || pred.isAtLeastRelease();
-
-		// Access type is neither release, acquire nor sequential
-		if (!isCorrectAccessType) {
-			return;
-		}
-
-		auto initial_po = g.po_preds(&pred);
-
-		for (const auto &pred : initial_po) {
-			initial_events.push_back(pred.getPos());
-		}
+	if (po_pred == nullptr) {
+		// No previous event in PO found
+		return;
 	}
 
-	llvm::outs() << "Initial Events for "<< lab->getPos() <<": ";
-	for (const auto &event : initial_events) {
-		llvm::outs() << event << " ";
-	}gi
-	llvm::outs() << "\n";
+	auto initial_po = po_imm_pred(g, po_pred);
+	if (initial_po == nullptr) {
+		// No previous event in PO found
+		return;
+	}
+
+	bool isCorrectAccessType = po_pred->isAtLeastAcquire() || po_pred->isAtLeastRelease();
+	if (!isCorrectAccessType) {
+		// Access type is neither release, acquire nor sequential
+		return;
+	}
+
+	relationRA[initial_po->getPos()] = lab->getPos();
+
+	llvm::outs() << "RA "<< initial_po->getPos() << " -> " << lab->getPos() << "\n";
+}
+
+void JAM21Driver::calculateSVO(const EventLabel *lab) const {
+	auto &g = getGraph();
+	auto po_pred = g.po_preds(lab);
 }
 
 bool JAM21Driver::isDepTracking() const
@@ -69,9 +66,10 @@ const View &JAM21Driver::getHbView(const EventLabel *lab) const
 
 bool JAM21Driver::isWriteRfBefore(Event a, Event b)
 {
+	/*
 	auto &g = getGraph();
 	auto &before = g.getEventLabel(b)->view(0);
-	if (before.contains(a))
+	if (before.contains(a)) //TODO segfaults here
 		return true;
 
 	const EventLabel *lab = g.getEventLabel(a);
@@ -81,6 +79,8 @@ bool JAM21Driver::isWriteRfBefore(Event a, Event b)
 	for (auto &rLab : wLab->readers())
 		if (before.contains(rLab.getPos()))
 			return true;
+
+	 */
 	return false;
 }
 
@@ -591,6 +591,7 @@ bool JAM21Driver::visitError2(const EventLabel *lab) const
 
 bool JAM21Driver::visitLHSUnlessError2_0(const EventLabel *lab, const View &v) const
 {
+	/*
 	auto &g = getGraph();
 
 
@@ -599,7 +600,7 @@ cexLab = lab;
 		return false;
 	}
 
-
+*/
 	return true;
 }
 
@@ -730,7 +731,7 @@ bool JAM21Driver::visitLHSUnlessError4_0(const EventLabel *lab, const View &v) c
 
 
 	if (!v.contains(lab->getPos())) {
-cexLab = lab;
+	cexLab = lab;
 		return false;
 	}
 
@@ -791,10 +792,11 @@ bool JAM21Driver::checkError4(const EventLabel *lab) const
 	auto &g = getGraph();
 
 
-	if (visitUnlessError4(lab))
-		return true;
+	//if (visitUnlessError4(lab))
+	//	return true;
 
-	return visitError4(lab);
+	//return visitError4(lab);
+	return true;
 }
 bool JAM21Driver::visitError5(const EventLabel *lab) const
 {
@@ -1159,6 +1161,7 @@ bool JAM21Driver::visitUnlessWarning9(const EventLabel *lab) const
 
 bool JAM21Driver::checkWarning9(const EventLabel *lab) const
 {
+	/*
 	auto &g = getGraph();
 
 
@@ -1166,6 +1169,9 @@ bool JAM21Driver::checkWarning9(const EventLabel *lab) const
 		return true;
 
 	return visitWarning9(lab);
+
+	 */
+	return true;
 }
 VerificationError JAM21Driver::checkErrors(const EventLabel *lab, const EventLabel *&race) const
 {

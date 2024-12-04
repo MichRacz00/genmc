@@ -66,7 +66,10 @@ public:
 
 private:
 	void calculateRA(const EventLabel *lab) const;
-	std::map<Event, std::vector<Event>> relationRA;
+	mutable std::map<Event, Event> relationRA;
+
+	void calculateSVO(const EventLabel *lab) const;
+	std::map<Event, std::vector<Event>> relationSVO;
 
 	bool isWriteRfBefore(Event a, Event b);
 	std::vector<Event> getInitRfsAtLoc(SAddr addr);
