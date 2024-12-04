@@ -923,6 +923,9 @@ void GenMCDriver::explore()
 
 		auto validExecution = false;
 		while (!validExecution) {
+			auto &g = getGraph();
+			llvm::outs() << g << "\n";
+
 			/*
 			 * restrictAndRevisit() might deem some execution infeasible,
 			 * so we have to reset all exploration options before

@@ -6,6 +6,36 @@ JAM21Driver::JAM21Driver(std::shared_ptr<const Config> conf, std::unique_ptr<llv
 		std::unique_ptr<ModuleInfo> MI, GenMCDriver::Mode mode /* = GenMCDriver::VerificationMode{} */)
 	: GenMCDriver(conf, std::move(mod), std::move(MI), mode) {}
 
+bool JAM21Driver::isConsistent(const EventLabel *lab) const
+{
+	calculateRA(lab);
+	return true;
+}
+
+void JAM21Driver::calculateRA(const EventLabel *lab) const {
+	auto &g = getGraph();
+
+	auto po_pred = g.po_preds(lab);
+	llvm::outs() << "Checking PO:\n";
+	llvm::outs() << lab->getPos() << "\n";
+
+	// Multiple PO preds when threds joining (?)
+	for (const auto &pred : po_pred) {
+		bool isCorrectAccessType = pred.isAtLeastAcquire() || pred.isAtLeastRelease();
+
+		// Access type is neither release, acquire nor sequential
+		if (!isCorrectAccessType) {
+			return;
+		}
+
+		auto initial_po = g.po_preds(&pred);
+
+		for (const auto &pred : initial_po) {
+			printf("Found RA!\n");
+		}
+	}
+}
+
 bool JAM21Driver::isDepTracking() const
 {
 	return 0;
@@ -1408,13 +1438,6 @@ std::vector<VerificationError> JAM21Driver::checkWarnings(const EventLabel *lab,
 	}
 
 	return result;
-}
-
-bool JAM21Driver::isConsistent(const EventLabel *lab) const
-{
-	printf("JAM21Driver::isConsistent\n");
-	return true
-		&& checkConsAcyclic1(lab);
 }
 
 View JAM21Driver::calcPPoRfBefore(const EventLabel *lab) const

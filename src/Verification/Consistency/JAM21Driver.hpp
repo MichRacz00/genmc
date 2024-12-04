@@ -65,6 +65,9 @@ public:
 	std::vector<Event> getCoherentPlacings(SAddr addr, Event store, bool isRMW) override;
 
 private:
+	void calculateRA(const EventLabel *lab) const;
+
+
 	bool isWriteRfBefore(Event a, Event b);
 	std::vector<Event> getInitRfsAtLoc(SAddr addr);
 	bool isHbOptRfBefore(const Event e, const Event write);
