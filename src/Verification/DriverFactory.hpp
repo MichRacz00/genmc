@@ -27,6 +27,7 @@
 #include "Verification/Consistency/RC11Driver.hpp"
 #include "Verification/Consistency/SCDriver.hpp"
 #include "Verification/Consistency/TSODriver.hpp"
+#include "Verification/Consistency/JAM21Driver.hpp"
 #include <llvm/IR/Module.h>
 
 class DriverFactory {
@@ -56,6 +57,7 @@ public:
 			CREATE_MODEL_DRIVER(RA);
 			CREATE_MODEL_DRIVER(RC11);
 			CREATE_MODEL_DRIVER(IMM);
+			CREATE_MODEL_DRIVER(JAM21);
 		default:
 			BUG();
 		}
