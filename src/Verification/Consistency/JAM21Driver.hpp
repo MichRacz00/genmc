@@ -51,8 +51,8 @@ public:
 	JAM21Driver(std::shared_ptr<const Config> conf, std::unique_ptr<llvm::Module> mod,
 		std::unique_ptr<ModuleInfo> MI, GenMCDriver::Mode mode = GenMCDriver::VerificationMode{});
 
-	void calculateSaved(EventLabel *lab);
-	void calculateViews(EventLabel *lab);
+	//void calculateSaved(EventLabel *lab);
+	//void calculateViews(EventLabel *lab);
 	void updateMMViews(EventLabel *lab) override;
 	bool isDepTracking() const override;
 	bool isConsistent(const EventLabel *lab) const override;

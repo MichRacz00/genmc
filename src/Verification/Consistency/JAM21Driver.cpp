@@ -16,8 +16,6 @@ void JAM21Driver::calculateRA(const EventLabel *lab) const {
 	auto &g = getGraph();
 
 	auto po_pred = g.po_preds(lab);
-	llvm::outs() << "Checking PO:\n";
-	llvm::outs() << lab->getPos() << "\n";
 
 	// Multiple PO preds when threds joining (?)
 	for (const auto &pred : po_pred) {
@@ -31,7 +29,7 @@ void JAM21Driver::calculateRA(const EventLabel *lab) const {
 		auto initial_po = g.po_preds(&pred);
 
 		for (const auto &pred : initial_po) {
-			printf("Found RA!\n");
+			llvm::outs() << "Found RA between: " << *lab << " and " << pred << "\n";
 		}
 	}
 }
@@ -265,20 +263,20 @@ auto JAM21Driver::checkCalc62(const EventLabel *lab) const
 
 	return visitCalc62(lab);
 }
-void JAM21Driver::calculateSaved(EventLabel *lab)
-{
-}
 
+/*
 void JAM21Driver::calculateViews(EventLabel *lab)
 {
 	lab->addView(checkCalc57(lab));
 	lab->addView(checkCalc62(lab));
 }
+ */
 
 void JAM21Driver::updateMMViews(EventLabel *lab)
 {
-	calculateViews(lab);
-	calculateSaved(lab);
+	printf("Updating MM Views\n");
+	//calculateViews(lab);
+	//calculateSaved(lab);
 	lab->setPrefixView(calculatePrefixView(lab));
 }
 
