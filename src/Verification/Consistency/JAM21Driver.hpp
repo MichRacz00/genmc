@@ -51,11 +51,10 @@ public:
 	JAM21Driver(std::shared_ptr<const Config> conf, std::unique_ptr<llvm::Module> mod,
 		std::unique_ptr<ModuleInfo> MI, GenMCDriver::Mode mode = GenMCDriver::VerificationMode{});
 
-	//void calculateSaved(EventLabel *lab);
-	//void calculateViews(EventLabel *lab);
-	void updateMMViews(EventLabel *lab) override;
-	bool isDepTracking() const override;
 	bool isConsistent(const EventLabel *lab) const override;
+	void updateMMViews(EventLabel *lab) override;
+
+	bool isDepTracking() const override;
 	VerificationError checkErrors(const EventLabel *lab, const EventLabel *&race) const override;
 	std::vector<VerificationError> checkWarnings(const EventLabel *lab, const VSet<VerificationError> &seenWarnings, std::vector<const EventLabel *> &racyLabs) const;
 	std::unique_ptr<VectorClock> calculatePrefixView(const EventLabel *lab) const override;
@@ -67,7 +66,6 @@ public:
 private:
 	void calculateRA(const EventLabel *lab) const;
 
-
 	bool isWriteRfBefore(Event a, Event b);
 	std::vector<Event> getInitRfsAtLoc(SAddr addr);
 	bool isHbOptRfBefore(const Event e, const Event write);
@@ -78,31 +76,8 @@ private:
 	std::vector<Event> getMOInvOptRfAfter(const WriteLabel *sLab);
 	mutable const EventLabel *cexLab{};
 
-	mutable std::vector<NodeStatus> visitedCalc57_0;
-	mutable std::vector<NodeStatus> visitedCalc57_1;
-	mutable std::vector<NodeStatus> visitedCalc57_2;
-	mutable std::vector<NodeStatus> visitedCalc57_3;
-
-	bool visitCalc57_0(const EventLabel *lab, View &calcRes) const;
-	bool visitCalc57_1(const EventLabel *lab, View &calcRes) const;
-	bool visitCalc57_2(const EventLabel *lab, View &calcRes) const;
-	bool visitCalc57_3(const EventLabel *lab, View &calcRes) const;
-
-	View visitCalc57(const EventLabel *lab) const;
 	const View&getHbStableView(const EventLabel *lab) const { return lab->view(0); }
 
-	auto checkCalc57(const EventLabel *lab) const;
-	mutable std::vector<NodeStatus> visitedCalc62_0;
-	mutable std::vector<NodeStatus> visitedCalc62_1;
-	mutable std::vector<NodeStatus> visitedCalc62_2;
-	mutable std::vector<NodeStatus> visitedCalc62_3;
-
-	bool visitCalc62_0(const EventLabel *lab, View &calcRes) const;
-	bool visitCalc62_1(const EventLabel *lab, View &calcRes) const;
-	bool visitCalc62_2(const EventLabel *lab, View &calcRes) const;
-	bool visitCalc62_3(const EventLabel *lab, View &calcRes) const;
-
-	View visitCalc62(const EventLabel *lab) const;
 	const View&getPorfStableView(const EventLabel *lab) const { return lab->view(1); }
 
 	auto checkCalc62(const EventLabel *lab) const;
