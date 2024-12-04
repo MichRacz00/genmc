@@ -1435,7 +1435,6 @@ std::vector<VerificationError> SCDriver::checkWarnings(const EventLabel *lab, co
 
 bool SCDriver::isConsistent(const EventLabel *lab) const
 {
-
 	return true
 		&& checkConsAcyclic1(lab);
 }

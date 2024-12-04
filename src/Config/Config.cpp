@@ -50,7 +50,8 @@ static llvm::cl::opt<ModelType> clModelType(
 			 clEnumValN(ModelType::TSO, "tso", "TSO memory model"),
 			 clEnumValN(ModelType::RA, "ra", "RA+RLX memory model"),
 			 clEnumValN(ModelType::RC11, "rc11", "RC11 memory model (default)"),
-			 clEnumValN(ModelType::IMM, "imm", "IMM memory model")),
+			 clEnumValN(ModelType::IMM, "imm", "IMM memory model"),
+			 clEnumValN(ModelType::JAM21, "jam21", "JAM21 memory model")),
 	llvm::cl::cat(clGeneral), llvm::cl::init(ModelType::RC11),
 	llvm::cl::desc("Choose model type:"));
 

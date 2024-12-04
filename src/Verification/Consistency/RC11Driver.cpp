@@ -3825,7 +3825,6 @@ std::vector<VerificationError> RC11Driver::checkWarnings(const EventLabel *lab, 
 
 bool RC11Driver::isConsistent(const EventLabel *lab) const
 {
-
 	return true
 		&& checkConsAcyclic1(lab);
 }
