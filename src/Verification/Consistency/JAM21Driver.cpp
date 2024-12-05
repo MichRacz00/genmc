@@ -81,11 +81,26 @@ void JAM21Driver::calculateSVO(const EventLabel *lab) const {
 	}
 
 	// Get the initial event
-	auto initial_po_pred = po_imm_pred(g, third_po_pred);
-	if (initial_po_pred == nullptr) return;
+	auto initial_po = po_imm_pred(g, third_po_pred);
+	if (initial_po == nullptr) return;
+	
+	llvm::outs() << "SVO " << initial_po->getPos() << " -> " << lab->getPos() << "\n";
 
-	//relationSVO[initial_po->getPos()] = lab->getPos();
-	llvm::outs() << "SVO " << initial_po_pred->getPos() << " -> " << lab->getPos() << "\n";
+	relationSVO[initial_po->getPos()] = lab->getPos();
+}
+
+void JAM21Driver::calculateSpush(const EventLabel *lab) const {
+	auto &g = getGraph();
+	auto po_pred = po_imm_pred(g, lab);
+	auto initial_po = po_imm_pred(g, po_pred);
+	if (po_pred == nullptr || initial_po == nullptr) return;
+
+	if (!(po_pred->getKind() == EventLabel::EventLabelKind::Fence
+	    && po_pred->getOrdering() == llvm::AtomicOrdering::SequentiallyConsistent)) {
+		return;
+	}
+
+	relationSpush[initial_po->getPos()] = lab->getPos();
 }
 
 bool JAM21Driver::isDepTracking() const
