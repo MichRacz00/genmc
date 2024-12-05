@@ -113,7 +113,7 @@ void JAM21Driver::calculateVolint(const EventLabel *lab) const {
 	if (lab->getOrdering() != llvm::AtomicOrdering::SequentiallyConsistent) return;
 
 	auto &g = getGraph();
-	auto initial_po = po_imm_pred(g, po_pred);
+	auto initial_po = po_imm_pred(g, lab);
 	if (initial_po == nullptr) return;
 	if (initial_po->getOrdering() == llvm::AtomicOrdering::SequentiallyConsistent) return;
 
