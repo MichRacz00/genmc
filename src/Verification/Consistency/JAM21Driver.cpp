@@ -29,7 +29,7 @@ void JAM21Driver::calculateRA(const EventLabel *lab) const {
 
 	// If the first event is neither a read nor a write, ignore
 	bool isReadOrWrite = po_pred->getKind() == EventLabel::EventLabelKind::Read
-		|| initial_po->getKind() == EventLabel::EventLabelKind::Write;
+		|| po_pred->getKind() == EventLabel::EventLabelKind::Write;
 	if (!isReadOrWrite) return;
 
 	// Check for access type, either acquire, release or sequential (volotile)
@@ -85,7 +85,7 @@ void JAM21Driver::calculateSVO(const EventLabel *lab) const {
 	if (initial_po_pred == nullptr) return;
 
 	//relationSVO[initial_po->getPos()] = lab->getPos();
-	llvm::outs() << "SVO found between " << initial_po_pred->getPos() << " -> " << lab->getPos() << "\n";
+	llvm::outs() << "SVO " << initial_po_pred->getPos() << " -> " << lab->getPos() << "\n";
 }
 
 bool JAM21Driver::isDepTracking() const
