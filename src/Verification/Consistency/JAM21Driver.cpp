@@ -83,12 +83,15 @@ void JAM21Driver::calculateSVO(const EventLabel *lab) const {
 	// Get the initial event
 	auto initial_po = po_imm_pred(g, third_po_pred);
 	if (initial_po == nullptr) return;
-	
+
 	llvm::outs() << "SVO " << initial_po->getPos() << " -> " << lab->getPos() << "\n";
 
 	relationSVO[initial_po->getPos()] = lab->getPos();
 }
 
+/**
+* spush := po; [sc fence]; po
+*/
 void JAM21Driver::calculateSpush(const EventLabel *lab) const {
 	auto &g = getGraph();
 	auto po_pred = po_imm_pred(g, lab);
@@ -99,6 +102,20 @@ void JAM21Driver::calculateSpush(const EventLabel *lab) const {
 	    && po_pred->getOrdering() == llvm::AtomicOrdering::SequentiallyConsistent)) {
 		return;
 	}
+
+	relationSpush[initial_po->getPos()] = lab->getPos();
+}
+
+/**
+* volint := [volotile access]; po; [volotile access]
+*/
+void JAM21Driver::calculateVolint(const EventLabel *lab) const {
+	if (lab->getOrdering() != llvm::AtomicOrdering::SequentiallyConsistent) return;
+
+	auto &g = getGraph();
+	auto initial_po = po_imm_pred(g, po_pred);
+	if (initial_po == nullptr) return;
+	if (initial_po->getOrdering() == llvm::AtomicOrdering::SequentiallyConsistent) return;
 
 	relationSpush[initial_po->getPos()] = lab->getPos();
 }
