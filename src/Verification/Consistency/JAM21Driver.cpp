@@ -17,7 +17,6 @@ bool JAM21Driver::isConsistent(const EventLabel *lab) const
  *  RA := po; [REL | ACQ | V]; po
  */
 // TODO: leverage visited status not to calculate this again
-// TODO: Check if the accesses are R/W and not for example Fences
 void JAM21Driver::calculateRA(const EventLabel *lab) const {
 	auto &g = getGraph();
 
@@ -28,8 +27,8 @@ void JAM21Driver::calculateRA(const EventLabel *lab) const {
 	if (po_pred == nullptr || initial_po == nullptr) return;
 
 	// If the first event is neither a read nor a write, ignore
-	bool isReadOrWrite = po_pred->classofKind(EventLabel::EventLabelKind::Read)
-		|| initial_po->classofKind(EventLabel::EventLabelKind::Write);
+	bool isReadOrWrite = po_pred->getKind() == EventLabel::EventLabelKind::Read
+		|| initial_po->getKind() == EventLabel::EventLabelKind::Write;
 	if (!isReadOrWrite) return;
 
 	bool isCorrectAccessType = po_pred->isAtLeastAcquire() || po_pred->isAtLeastRelease();
@@ -38,6 +37,7 @@ void JAM21Driver::calculateRA(const EventLabel *lab) const {
 		return;
 	}
 
+	// Add RA relation
 	relationRA[initial_po->getPos()] = lab->getPos();
 
 	llvm::outs() << "RA "<< initial_po->getPos() << " -> " << lab->getPos() << "\n";
