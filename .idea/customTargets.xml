@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CLionExternalBuildManager">
+    <target id="ee86ea5f-7246-4cac-8a42-bce3f872f8bd" name="Build GenMC" defaultType="MAKE">
+      <configuration id="e9136745-48aa-4830-847f-175b83d8a00d" name="Build GenMC">
+        <build type="MAKE">
+          <make targetName="make -j8" />
+        </build>
+      </configuration>
+    </target>
+  </component>
+</project>

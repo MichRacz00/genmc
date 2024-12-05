@@ -20,18 +20,17 @@ bool JAM21Driver::isConsistent(const EventLabel *lab) const
 // TODO: Check if the accesses are R/W and not for example Fences
 void JAM21Driver::calculateRA(const EventLabel *lab) const {
 	auto &g = getGraph();
+
 	auto po_pred = po_imm_pred(g, lab);
-
-	if (po_pred == nullptr) {
-		// No previous event in PO found
-		return;
-	}
-
 	auto initial_po = po_imm_pred(g, po_pred);
-	if (initial_po == nullptr) {
-		// No previous event in PO found
-		return;
-	}
+
+	// Check if there exist two previous events in PO
+	if (po_pred == nullptr || initial_po == nullptr) return;
+
+	// If the first event is neither a read nor a write, ignore
+	bool isReadOrWrite = po_pred->classofKind(EventLabel::EventLabelKind::Read)
+		|| initial_po->classofKind(EventLabel::EventLabelKind::Write);
+	if (!isReadOrWrite) return;
 
 	bool isCorrectAccessType = po_pred->isAtLeastAcquire() || po_pred->isAtLeastRelease();
 	if (!isCorrectAccessType) {
