@@ -9,6 +9,7 @@ JAM21Driver::JAM21Driver(std::shared_ptr<const Config> conf, std::unique_ptr<llv
 bool JAM21Driver::isConsistent(const EventLabel *lab) const
 {
 	calculateRA(lab);
+	calculateSVO(lab);
 	return true;
 }
 
@@ -31,9 +32,11 @@ void JAM21Driver::calculateRA(const EventLabel *lab) const {
 		|| initial_po->getKind() == EventLabel::EventLabelKind::Write;
 	if (!isReadOrWrite) return;
 
-	bool isCorrectAccessType = po_pred->isAtLeastAcquire() || po_pred->isAtLeastRelease();
+	// Check for access type, either acquire, release or sequential (volotile)
+	bool isCorrectAccessType = po_pred->getOrdering() == llvm::AtomicOrdering::Release
+				   			|| po_pred->getOrdering() == llvm::AtomicOrdering::Acquire
+					        || po_pred->getOrdering() == llvm::AtomicOrdering::SequentiallyConsistent;
 	if (!isCorrectAccessType) {
-		// Access type is neither release, acquire nor sequential
 		return;
 	}
 
@@ -54,8 +57,9 @@ void JAM21Driver::calculateSVO(const EventLabel *lab) const {
 	// Check if predacessor in PO exists
 	if (first_po_pred == nullptr) return;
 
-	if (first_po_pred->classofKind(EventLabel::EventLabelKind::Fence)) {
-		printf("Is a fence");
+	if (first_po_pred->getKind() == EventLabel::EventLabelKind::Fence
+	    && first_po_pred->getOrdering() == llvm::AtomicOrdering::Acquire) {
+		printf("Correct fence\n");
 	}
 
 	auto second_po_pred = po_imm_pred(g, first_po_pred);
