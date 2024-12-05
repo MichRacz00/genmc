@@ -54,23 +54,38 @@ void JAM21Driver::calculateSVO(const EventLabel *lab) const {
 	auto &g = getGraph();
 
 	auto first_po_pred = po_imm_pred(g, lab);
-	// Check if predacessor in PO exists
 	if (first_po_pred == nullptr) return;
 
-	if (first_po_pred->getKind() == EventLabel::EventLabelKind::Fence
-	    && first_po_pred->getOrdering() == llvm::AtomicOrdering::Acquire) {
-		printf("Correct fence\n");
+	// Check if first event is acq fence
+	if (!(first_po_pred->getKind() == EventLabel::EventLabelKind::Fence
+	    && first_po_pred->getOrdering() == llvm::AtomicOrdering::Acquire)) {
+		return;
 	}
 
 	auto second_po_pred = po_imm_pred(g, first_po_pred);
 	if (second_po_pred == nullptr) return;
 
+	// Check if second event is either a read or a write
+	if (!(second_po_pred->getKind() == EventLabel::EventLabelKind::Read
+	    || second_po_pred->getKind() == EventLabel::EventLabelKind::Write)) {
+		return;
+	}
+
 	auto third_po_pred = po_imm_pred(g, second_po_pred);
 	if (third_po_pred == nullptr) return;
 
-	if (third_po_pred->classofKind(EventLabel::EventLabelKind::Fence)) {
-		printf("Is a fence");
+	// Check if the initial event is a release fence
+	if (!(third_po_pred->getKind() == EventLabel::EventLabelKind::Fence
+	    && third_po_pred->getOrdering() == llvm::AtomicOrdering::Release)) {
+		return;
 	}
+
+	// Get the initial event
+	auto initial_po_pred = po_imm_pred(g, third_po_pred);
+	if (initial_po_pred == nullptr) return;
+
+	//relationSVO[initial_po->getPos()] = lab->getPos();
+	llvm::outs() << "SVO found between " << initial_po_pred->getPos() << " -> " << lab->getPos() << "\n";
 }
 
 bool JAM21Driver::isDepTracking() const
