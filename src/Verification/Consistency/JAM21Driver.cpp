@@ -17,6 +17,7 @@ bool JAM21Driver::isConsistent(const EventLabel *lab) const
  *  RA := po; [REL | ACQ | V]; po
  */
 // TODO: leverage visited status not to calculate this again
+// TODO: Check if the accesses are R/W and not for example Fences
 void JAM21Driver::calculateRA(const EventLabel *lab) const {
 	auto &g = getGraph();
 	auto po_pred = po_imm_pred(g, lab);
@@ -43,9 +44,30 @@ void JAM21Driver::calculateRA(const EventLabel *lab) const {
 	llvm::outs() << "RA "<< initial_po->getPos() << " -> " << lab->getPos() << "\n";
 }
 
+/*
+ *	Calculates svo relation
+ *  svo := po; [F Rel]; po; [W | R]; po; [F Acq]; po
+ */
 void JAM21Driver::calculateSVO(const EventLabel *lab) const {
 	auto &g = getGraph();
-	auto po_pred = g.po_preds(lab);
+
+	auto first_po_pred = po_imm_pred(g, lab);
+	// Check if predacessor in PO exists
+	if (first_po_pred == nullptr) return;
+
+	if (first_po_pred->classofKind(EventLabel::EventLabelKind::Fence)) {
+		printf("Is a fence");
+	}
+
+	auto second_po_pred = po_imm_pred(g, first_po_pred);
+	if (second_po_pred == nullptr) return;
+
+	auto third_po_pred = po_imm_pred(g, second_po_pred);
+	if (third_po_pred == nullptr) return;
+
+	if (third_po_pred->classofKind(EventLabel::EventLabelKind::Fence)) {
+		printf("Is a fence");
+	}
 }
 
 bool JAM21Driver::isDepTracking() const

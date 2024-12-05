@@ -84,6 +84,7 @@ libgenmc_a_SOURCES = \
   src/Verification/Consistency/RC11Driver.cpp \
   src/Verification/Consistency/RoundBoundDecider.cpp \
   src/Verification/Consistency/SCDriver.cpp \
+  src/Verification/Consistency/JAM21Driver.cpp \
   src/Verification/Consistency/TSODriver.cpp \
   src/main.cpp
 
